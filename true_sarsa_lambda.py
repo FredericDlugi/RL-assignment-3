@@ -9,6 +9,7 @@ def replacing_trace(trace, activeTiles, lam, gamma):
     # activeTiles: current active tile indices
     # lam: lambda
     # return: updated trace'''
+    trace = lam * gamma * trace
     trace[activeTiles] = 1
     return trace
 
@@ -35,6 +36,8 @@ class SARSA_lambda_Learner(object):
         self.trace = np.zeros((self.obs_bins[0]+1, self.obs_bins[1]+1, self.action_shape))
         self.traceUpdate = traceUpdate 
         self.lam = 0.95 # lambda, to be modified in other tasks
+
+        self.q_old = 0
         
     def discretize(self, obs):
         return tuple(np.round((obs - self.obs_low) / self.bin_width).astype(int))
@@ -52,26 +55,34 @@ class SARSA_lambda_Learner(object):
         #action - Action choosen in State (from policy)
         #reward - reward from taing this action in that state
         #next_obs - Next State
-        #next_action - following that policy the next action
+        #next_action - following that exploration policy the next action
+        #next_action_greedy - following that (greedy) policy the next action
+        
         discretized_obs = self.discretize(obs)
         discretized_next_obs = self.discretize(next_obs)
         discretized_sa = discretized_obs + (action,)
         discretized_next_sa = discretized_next_obs + (next_action,)
-        
-        # To do: Compute td_delta -> Done
-        td_delta = reward - self.Q[discretized_sa]
+
+        q = self.Q[discretized_sa]
+        q_next = self.Q[discretized_next_sa]
+        td_delta = reward - q
+
         if not done:
-            td_delta += self.gamma * self.Q[discretized_next_sa]
+            td_delta += self.gamma * q_next
+
         # Update the visit counts as statistics for later analysis.
         self.visit_counts[discretized_obs][action] += 1
         # Update the trace
         self.traceUpdate(self.trace, discretized_sa, self.lam, self.gamma)
+
         # To Do: update the q table -> DOne by python magic?
-        self.Q = self.Q + self.alpha * td_delta * self.trace
-        self.trace = self.gamma * self.lam * self.trace
-        # TO DO: post-process the trace after the episode ends ?
+        self.Q = self.Q + self.alpha * (td_delta + self.q_old) * self.trace
+        self.Q[discretized_sa] = self.Q[discretized_sa] - self.alpha * (q-self.q_old)
+        self.q_old = q_next
+
         if done:
             self.trace = np.zeros((self.obs_bins[0]+1, self.obs_bins[1]+1, self.action_shape))
+            self.q_old = 0
 
 
 def train(agent, env, MAX_NUM_EPISODES):
@@ -88,11 +99,11 @@ def train(agent, env, MAX_NUM_EPISODES):
         obs = env.reset()
         episodic_return = 0.0 # episodic reward
         action = agent.get_action(obs)
-        while not done:            
+        while not done:
             next_obs, reward, done, info = env.step(action)
             total_interaction_count+= 1
             next_action = agent.get_action(next_obs)
-            agent.learn(obs, action, reward, done, next_obs, next_action)     
+            agent.learn(obs, action, reward, done, next_obs, next_action)
             episodic_return += reward
             action = next_action
             obs = next_obs
@@ -144,10 +155,10 @@ if __name__ == "__main__":
     agent = SARSA_lambda_Learner(env, replacing_trace)
     learned_policy, Q, visit_counts, episodic_returns = train(agent, env, MAX_NUM_EPISODES)
     # save the data here
-    np.save('data/SARSA_Q' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) +'.npy', Q)
-    np.save('data/SARSA_POLICY' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) +'.npy', learned_policy)
-    np.save('data/SARSA_VISITS' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '.npy', visit_counts)
-    np.save('data/SARSA_RETURN' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '.npy', episodic_returns)
+    np.save('data/TRUE_SARSA_Q' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) +'.npy', Q)
+    np.save('data/TRUE_SARSA_POLICY' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) +'.npy', learned_policy)
+    np.save('data/TRUE_SARSA_VISITS' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '.npy', visit_counts)
+    np.save('data/TRUE_SARSA_RETURN' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '.npy', episodic_returns)
 
     # after training, test the policy 10 times.
     for _ in range(10):
