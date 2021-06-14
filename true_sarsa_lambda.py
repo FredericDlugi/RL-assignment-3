@@ -89,11 +89,11 @@ def train(agent, env, MAX_NUM_EPISODES):
     best_reward = -float('inf')
     # Record the total number of interactions
     total_interaction_count = 0
+    episodic_returns = np.zeros(MAX_NUM_EPISODES)
     
     for episode in range(MAX_NUM_EPISODES):
         # Decaying epsilon-greedy
         agent.epsilon = 1 - episode/MAX_NUM_EPISODES
-        episodic_returns = np.zeros(MAX_NUM_EPISODES)
         done = False
         # Fetch the initial state
         obs = env.reset()
@@ -150,18 +150,20 @@ if __name__ == "__main__":
         TO DO : You need to add code for plotting the result and saving the statistics as in the last assignment.
     '''
     # To Do: later modify the MAX_NUM_EPISODES
-    MAX_NUM_EPISODES = 2000 
-    env = gym.make('MountainCar-v0').env     # Note: the episode only terminates when cars reaches the target, the max episode length is not clipped to 200 steps.
-    agent = SARSA_lambda_Learner(env, replacing_trace)
-    learned_policy, Q, visit_counts, episodic_returns = train(agent, env, MAX_NUM_EPISODES)
-    # save the data here
-    np.save('data/TRUE_SARSA_Q' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) +'.npy', Q)
-    np.save('data/TRUE_SARSA_POLICY' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) +'.npy', learned_policy)
-    np.save('data/TRUE_SARSA_VISITS' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '.npy', visit_counts)
-    np.save('data/TRUE_SARSA_RETURN' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '.npy', episodic_returns)
+    for t in ['franek', 'robin', 'frederic', 'moritz']:
+        MAX_NUM_EPISODES = 2000
+        team_member_id = t
+        env = gym.make('MountainCar-v0').env     # Note: the episode only terminates when cars reaches the target, the max episode length is not clipped to 200 steps.
+        agent = SARSA_lambda_Learner(env, replacing_trace)
+        learned_policy, Q, visit_counts, episodic_returns = train(agent, env, MAX_NUM_EPISODES)
+        # save the data here
+        np.save('data/TRUE_SARSA_Q_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  +'.npy', Q)
+        np.save('data/TRUE_SARSA_POLICY_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  +'.npy', learned_policy)
+        np.save('data/TRUE_SARSA_VISITS_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  + '.npy', visit_counts)
+        np.save('data/TRUE_SARSA_RETURN_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  + '.npy', episodic_returns)
 
-    # after training, test the policy 10 times.
-    for _ in range(10):
-        reward = test(agent, env, learned_policy)
-        print("Test reward: {}".format(reward))
-    env.close()
+        # after training, test the policy 10 times.
+        for _ in range(10):
+            reward = test(agent, env, learned_policy)
+            print("Test reward: {}".format(reward))
+        env.close()

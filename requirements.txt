@@ -54,7 +54,7 @@ pyqt=5.9.2=py38ha925a31_4
 python=3.8.8=h7840368_0_cpython
 python-dateutil=2.8.1=py_0
 python_abi=3.8=1_cp38
-pytorch=1.8.1=py3.8_cuda11.1_cudnn8_0
+#pytorch=1.8.1=py3.8_cuda11.1_cudnn8_0
 qt=5.9.7=vc14h73c81de_0
 scipy=1.6.2=py38he847743_0
 setuptools=49.6.0=py38haa244fe_3
@@ -63,8 +63,8 @@ six=1.15.0=pyh9f0ad1d_0
 sqlite=3.35.4=h8ffe710_0
 tk=8.6.10=h8ffe710_1
 toml=0.10.2=pyhd8ed1ab_0
-torchaudio=0.8.1=py38
-torchvision=0.9.1=py38_cu111
+#torchaudio=0.8.1=py38
+#torchvision=0.9.1=py38_cu111
 tornado=6.1=py38h294d835_1
 tqdm=4.60.0=pyhd8ed1ab_0
 typing_extensions=3.7.4.3=py_0
