@@ -9,7 +9,6 @@ def replacing_trace(trace, activeTiles, lam, gamma):
     # activeTiles: current active tile indices
     # lam: lambda
     # return: updated trace'''
-    trace = lam * gamma * trace
     trace[activeTiles] = 1
     return trace
 
@@ -65,20 +64,21 @@ class SARSA_lambda_Learner(object):
 
         q = self.Q[discretized_sa]
         q_next = self.Q[discretized_next_sa]
-        td_delta = reward - q
 
+        td_delta = reward - q
         if not done:
-            td_delta += self.gamma * q_next
+            td_delta = td_delta + self.gamma * q_next
 
         # Update the visit counts as statistics for later analysis.
         self.visit_counts[discretized_obs][action] += 1
         # Update the trace
-        self.traceUpdate(self.trace, discretized_sa, self.lam, self.gamma)
+        self.trace = self.traceUpdate(self.trace, discretized_sa, self.lam, self.gamma)
 
         # To Do: update the q table -> DOne by python magic?
-        self.Q = self.Q + self.alpha * (td_delta + self.q_old) * self.trace
+        self.Q = self.Q + self.alpha * (td_delta + q - self.q_old) * self.trace
         self.Q[discretized_sa] = self.Q[discretized_sa] - self.alpha * (q-self.q_old)
         self.q_old = q_next
+
 
         if done:
             self.trace = np.zeros((self.obs_bins[0]+1, self.obs_bins[1]+1, self.action_shape))
