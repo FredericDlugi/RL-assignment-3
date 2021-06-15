@@ -149,21 +149,20 @@ if __name__ == "__main__":
     ''' 
         TO DO : You need to add code for plotting the result and saving the statistics as in the last assignment.
     '''
-    for t in ['franek', 'robin', 'frederic', 'moritz']:
-        # To Do: later modify the MAX_NUM_EPISODES
-        MAX_NUM_EPISODES = 2000
-        env = gym.make('MountainCar-v0').env     # Note: the episode only terminates when cars reaches the target, the max episode length is not clipped to 200 steps.
-        agent = SARSA_lambda_Learner(env, replacing_trace)
-        team_member_id = t
-        learned_policy, Q, visit_counts, episodic_returns = train(agent, env, MAX_NUM_EPISODES)
-        # save the data here
-        np.save('data/WATKIN_Q_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES)+ '_' + str(team_member_id)  +'.npy', Q)
-        np.save('data/WATKIN_POLICY_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES)+ '_' + str(team_member_id)  +'.npy', learned_policy)
-        np.save('data/WATKIN_VISITS_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES)+ '_' + str(team_member_id)  + '.npy', visit_counts)
-        np.save('data/WATKIN_RETURN_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES)+ '_' + str(team_member_id)  + '.npy', episodic_returns)
+    # To Do: later modify the MAX_NUM_EPISODES
+    MAX_NUM_EPISODES = 2000
+    env = gym.make('MountainCar-v0').env     # Note: the episode only terminates when cars reaches the target, the max episode length is not clipped to 200 steps.
+    agent = SARSA_lambda_Learner(env, replacing_trace)
+    team_member_id = 'franek'
+    learned_policy, Q, visit_counts, episodic_returns = train(agent, env, MAX_NUM_EPISODES)
+    # save the data here
+    np.save('data/WATKIN_Q_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES)+ '_' + str(team_member_id)  +'.npy', Q)
+    np.save('data/WATKIN_POLICY_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES)+ '_' + str(team_member_id)  +'.npy', learned_policy)
+    np.save('data/WATKIN_VISITS_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES)+ '_' + str(team_member_id)  + '.npy', visit_counts)
+    np.save('data/WATKIN_RETURN_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES)+ '_' + str(team_member_id)  + '.npy', episodic_returns)
 
-        # after training, test the policy 10 times.
-        for _ in range(10):
-            reward = test(agent, env, learned_policy)
-            print("Test reward: {}".format(reward))
-        env.close()
+    # after training, test the policy 10 times.
+    for _ in range(10):
+        reward = test(agent, env, learned_policy)
+        print("Test reward: {}".format(reward))
+    env.close()

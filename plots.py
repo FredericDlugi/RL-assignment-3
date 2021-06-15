@@ -47,9 +47,9 @@ def show_q_tables(files, titles):
     grid.axes_row[0][2].set_title('action "push right"')
 
     for i in range(len(titles)):
-        grid.axes_column[0][i].set_ylabel(titles[i], rotation=0, size='large',x=-20)
+        grid.axes_column[0][i].set_ylabel(titles[i], rotation=0, size='large',x=-60)
 
-    plt.suptitle('Q-Table for SARSA(\lambda)')
+    plt.suptitle(r'Q-Table for SARSA($\lambda$)')
 
 
 
@@ -137,11 +137,6 @@ if __name__ == "__main__":
     env.reset()
 
 
-    show_q_tables(['data/SARSA_Q_0.95_2000_franek.npy','data/SARSA_Q_0_5000_.npy', 'data/SARSA_Q_0.5_5000_.npy','data/SARSA_Q_0.75_5000_.npy', 'data/SARSA_Q_0.99_5000_.npy'], ['Optimal policy', '\lambda = 0', '\lambda = 0.5', '\lambda = 0.75', '\lambda = 0.99'])
-
-    plt.show()
-
-
     
     ##### Task 2.1
 
@@ -150,17 +145,25 @@ if __name__ == "__main__":
     sarsa_return_data = ['data/SARSA_RETURN_0.95_2000_franek.npy', 'data/SARSA_RETURN_0.95_2000_moritz.npy',
                          'data/SARSA_RETURN_0.95_2000_frederic.npy', 'data/SARSA_RETURN_0.95_2000_robin.npy']
     show_returns(sarsa_return_data, 2000, True)
-    plt.title(r'SARSA(\lambda)')
+    plt.title(r'SARSA($\lambda$)')
+    plt.savefig('plots/SarsaReturnTask1.png')
     plt.show()
+
 
     ###### Task 2.2
 
     ## Returns
     sarsa_return_data = ['data/SARSA_RETURN_0_5000_.npy', 'data/SARSA_RETURN_0.5_5000_.npy', 'data/SARSA_RETURN_0.75_5000_.npy', 'data/SARSA_RETURN_0.99_5000_.npy']
-    show_returns(sarsa_return_data, 5000, False, ['\lambda = 0', '\lambda = 0.5', '\lambda = 0.75', '\lambda = 0.99'])
-    plt.title(r'SARSA(\lambda) on different \lambda')
+    show_returns(sarsa_return_data, 5000, False, [r'$\lambda = 0$', r'$\lambda = 0.5$', r'$\lambda = 0.75$', r'$\lambda = 0.99$'])
+    plt.title(r'SARSA($\lambda$) for different $\lambda$')
+    plt.savefig('plots/SarsaReturnTask2.png')
     plt.show()
 
+    show_q_tables(['data/SARSA_Q_0.95_2000_franek.npy', 'data/SARSA_Q_0_5000_.npy', 'data/SARSA_Q_0.5_5000_.npy',
+                   'data/SARSA_Q_0.75_5000_.npy', 'data/SARSA_Q_0.99_5000_.npy'],
+                  ['Optimal policy', r'$\lambda = 0$', r'$\lambda = 0.5$', r'$\lambda = 0.75$', r'$\lambda = 0.99$'])
+    plt.savefig('plots/Sarsa_Q_tables_task.png')
+    plt.show()
 
     ## Policy
     show_policy('data/SARSA_POLICY_0.95_2000_franek.npy')
@@ -199,15 +202,20 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
     watkins_return_data = ['data/WATKIN_RETURN_0.95_2000_franek.npy', 'data/WATKIN_RETURN_0.95_2000_frederic.npy','data/WATKIN_RETURN_0.95_2000_robin.npy','data/WATKIN_RETURN_0.95_2000_moritz.npy']
     show_returns(watkins_return_data, 2000, True)
-    plt.title('Off-policy Watkins Q (\lambda = 0.95)')
+    plt.title(r'Off-policy Watkins Q($\lambda = 0.95$)')
+    plt.savefig('plots/watkins.png')
 
     plt.show()
 
     true_sarsa_return_data = ['data/TRUE_SARSA_RETURN_0.95_2000_franek.npy', 'data/TRUE_SARSA_RETURN_0.95_2000_frederic.npy','data/TRUE_SARSA_RETURN_0.95_2000_robin.npy','data/TRUE_SARSA_RETURN_0.95_2000_moritz.npy']
     show_returns(true_sarsa_return_data, 2000, True)
-    plt.title('True-online Sarsa(\lambda = 0.95)')
-
+    plt.title(r'True-online Sarsa($\lambda = 0.95$)')
+    plt.savefig('plots/true-online-sarsa.png')
     plt.show()
 

@@ -3,13 +3,14 @@ import gym
 import numpy as np
 
 
-def replacing_trace(trace, activeTiles, lam, gamma):
+def replacing_trace(trace, activeTiles, lam, gamma, alpha):
     '''To do: replacing trace update rule
     # trace: old trace 
     # activeTiles: current active tile indices
     # lam: lambda
     # return: updated trace'''
-    trace[activeTiles] = 1
+    trace = gamma*lam*trace
+    trace[activeTiles] = 1.0 - alpha * gamma * lam * trace[activeTiles]
     return trace
 
 
@@ -72,7 +73,7 @@ class SARSA_lambda_Learner(object):
         # Update the visit counts as statistics for later analysis.
         self.visit_counts[discretized_obs][action] += 1
         # Update the trace
-        self.trace = self.traceUpdate(self.trace, discretized_sa, self.lam, self.gamma)
+        self.trace = self.traceUpdate(self.trace, discretized_sa, self.lam, self.gamma, self.alpha)
 
         # To Do: update the q table -> DOne by python magic?
         self.Q = self.Q + self.alpha * (td_delta + q - self.q_old) * self.trace
@@ -150,20 +151,20 @@ if __name__ == "__main__":
         TO DO : You need to add code for plotting the result and saving the statistics as in the last assignment.
     '''
     # To Do: later modify the MAX_NUM_EPISODES
-    for t in ['franek', 'robin', 'frederic', 'moritz']:
-        MAX_NUM_EPISODES = 2000
-        team_member_id = t
-        env = gym.make('MountainCar-v0').env     # Note: the episode only terminates when cars reaches the target, the max episode length is not clipped to 200 steps.
-        agent = SARSA_lambda_Learner(env, replacing_trace)
-        learned_policy, Q, visit_counts, episodic_returns = train(agent, env, MAX_NUM_EPISODES)
-        # save the data here
-        np.save('data/TRUE_SARSA_Q_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  +'.npy', Q)
-        np.save('data/TRUE_SARSA_POLICY_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  +'.npy', learned_policy)
-        np.save('data/TRUE_SARSA_VISITS_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  + '.npy', visit_counts)
-        np.save('data/TRUE_SARSA_RETURN_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  + '.npy', episodic_returns)
 
-        # after training, test the policy 10 times.
-        for _ in range(10):
-            reward = test(agent, env, learned_policy)
-            print("Test reward: {}".format(reward))
-        env.close()
+    MAX_NUM_EPISODES = 2000
+    team_member_id = 'franek'
+    env = gym.make('MountainCar-v0').env     # Note: the episode only terminates when cars reaches the target, the max episode length is not clipped to 200 steps.
+    agent = SARSA_lambda_Learner(env, replacing_trace)
+    learned_policy, Q, visit_counts, episodic_returns = train(agent, env, MAX_NUM_EPISODES)
+    # save the data here
+    np.save('data/TRUE_SARSA_Q_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  +'.npy', Q)
+    np.save('data/TRUE_SARSA_POLICY_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  +'.npy', learned_policy)
+    np.save('data/TRUE_SARSA_VISITS_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  + '.npy', visit_counts)
+    np.save('data/TRUE_SARSA_RETURN_' + str(agent.lam) + '_' + str(MAX_NUM_EPISODES) + '_' + str(team_member_id)  + '.npy', episodic_returns)
+
+    # after training, test the policy 10 times.
+    for _ in range(10):
+        reward = test(agent, env, learned_policy)
+        print("Test reward: {}".format(reward))
+    env.close()
